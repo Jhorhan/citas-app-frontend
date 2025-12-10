@@ -3,6 +3,10 @@
 import { useState } from "react";
 import Cookies from "js-cookie";
 import { api } from "@/lib/api";
+import GoogleButton from "../components/GoogleButton";
+
+
+
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -35,7 +39,7 @@ export default function LoginPage() {
         cliente: "/cliente",
         colaborador: "/colaborador",
         admin: "/admin",
-        superadmin: "/superadmin", // 👈 aquí está tu rol
+        superadmin: "/superadmin",
       };
 
       // Redirigir según rol
@@ -78,6 +82,12 @@ export default function LoginPage() {
           Entrar
         </button>
       </form>
+
+      {/* Separador visual */}
+      <div className="my-6 text-center text-gray-500">o continúa con</div>
+
+      {/* BOTÓN DE GOOGLE */}
+      <GoogleButton />
 
       {msg && <p className="mt-4">{msg}</p>}
     </main>
