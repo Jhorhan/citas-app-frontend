@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useParams } from "next/navigation";
 import Cookies from "js-cookie";
 import { api } from "@/lib/api";
-import GoogleButton from "../components/GoogleButton";
-
-
-
 
 export default function LoginPage() {
+  const params = useParams();
+  const empresaSlug = params?.empresaSlug as string | undefined;
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState("");
@@ -23,28 +23,37 @@ export default function LoginPage() {
         password,
       });
 
-      // Guardamos token
+      // Guardamos el token
       Cookies.set("token", res.usuario.token, {
         expires: 7,
         secure: false,
       });
 
-      setMsg("Login correcto");
-
-      // verificar rol
       const rol: string = res.usuario.rol;
 
-      // Mapeo de rutas por rol
+      /*
+        Reglas de redirección:
+        - superadmin NO usa empresaSlug
+        - los demás roles SI usan empresaSlug
+      */
+      if (rol === "superadmin") {
+        window.location.href = "/superadmin";
+        return;
+      }
+
+      if (!empresaSlug) {
+        setMsg("Error: empresa no identificada");
+        return;
+      }
+
       const redirectMap: Record<string, string> = {
-        cliente: "/cliente",
-        colaborador: "/colaborador",
-        admin: "/admin",
-        superadmin: "/superadmin",
+        cliente: `/${empresaSlug}/cliente`,
+        colaborador: `/${empresaSlug}/colaborador`,
+        admin: `/${empresaSlug}/admin`,
       };
 
-      // Redirigir según rol
-      window.location.href = redirectMap[rol] || "/login";
-
+      window.location.href =
+        redirectMap[rol] || `/${empresaSlug}/login`;
     } catch (err: unknown) {
       if (err instanceof Error) {
         setMsg("Error: " + err.message);
@@ -65,6 +74,7 @@ export default function LoginPage() {
           placeholder="Correo"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
         />
 
         <input
@@ -73,6 +83,7 @@ export default function LoginPage() {
           placeholder="Contraseña"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
 
         <button
@@ -83,11 +94,25 @@ export default function LoginPage() {
         </button>
       </form>
 
-      {/* Separador visual */}
-      <div className="my-6 text-center text-gray-500">o continúa con</div>
+      {/* 
+        El registro SOLO aplica para empresas,
+        el superadmin no se registra desde aquí
+      */}
+      {empresaSlug && (
+        <p className="mt-4 text-center text-sm">
+          ¿No tienes cuenta?{" "}
+          <a
+            href={`/${empresaSlug}/register`}
+            className="text-blue-600 underline"
+          >
+            Regístrate aquí
+          </a>
+        </p>
+      )}
 
-      {/* BOTÓN DE GOOGLE */}
-      <GoogleButton />
+      <div className="my-6 text-center text-gray-400 text-sm">
+        Inicio con Google (próximamente)
+      </div>
 
       {msg && <p className="mt-4">{msg}</p>}
     </main>
