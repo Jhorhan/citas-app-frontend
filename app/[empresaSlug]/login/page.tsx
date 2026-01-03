@@ -23,11 +23,7 @@ export default function LoginPage() {
         password,
       });
 
-      // Guardamos el token
-      Cookies.set("token", res.usuario.token, {
-        expires: 7,
-        secure: false,
-      });
+
 
       const rol: string = res.usuario.rol;
 
@@ -35,6 +31,7 @@ export default function LoginPage() {
         Reglas de redirección:
         - superadmin NO usa empresaSlug
         - los demás roles SI usan empresaSlug
+
       */
       if (rol === "superadmin") {
         window.location.href = "/superadmin";
@@ -109,10 +106,6 @@ export default function LoginPage() {
           </a>
         </p>
       )}
-
-      <div className="my-6 text-center text-gray-400 text-sm">
-        Inicio con Google (próximamente)
-      </div>
 
       {msg && <p className="mt-4">{msg}</p>}
     </main>
