@@ -70,15 +70,16 @@ export default function AdminLayout({
             show={menuOpen}
           />
           <MenuItem
-            label="Horarios"
-            href={`/${empresaSlug}/admin/horarios`}
-            show={menuOpen}
-          />
-          <MenuItem
             label="Servicios"
             href={`/${empresaSlug}/admin/servicios`}
             show={menuOpen}
           />
+          <MenuItem
+            label="Horarios"
+            href={`/${empresaSlug}/admin/horarios`}
+            show={menuOpen}
+          />
+          
           <MenuItem
             label="Citas"
             href={`/${empresaSlug}/admin/citas`}
