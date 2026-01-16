@@ -8,6 +8,7 @@ export async function api(
   data?: any
 ) {
   const token = Cookies.get("token");
+  console.log("Token en cookie:", token); // 👈 solo para depurar
 
   const config: RequestInit = {
     method,

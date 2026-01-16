@@ -14,51 +14,56 @@ export default function LoginPage() {
   const [msg, setMsg] = useState("");
 
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setMsg("Cargando...");
+  e.preventDefault();
+  setMsg("Cargando...");
 
-    try {
-      const res = await api("/api/usuarios/login", "POST", {
-        email,
-        password,
-      });
+  try {
+    const res = await api("/api/usuarios/login", "POST", {
+      email,
+      password,
+    });
 
 
+    // 🔐 Guardar token
+    const token = res.usuario?.token;
 
-      const rol: string = res.usuario.rol;
+    if (!token) {
+      setMsg("No se recibió token del servidor");
+      return;
+    }
 
-      /*
-        Reglas de redirección:
-        - superadmin NO usa empresaSlug
-        - los demás roles SI usan empresaSlug
+    Cookies.set("token", token);
 
-      */
-      if (rol === "superadmin") {
-        window.location.href = "/superadmin";
-        return;
-      }
+    const rol: string = res.usuario.rol;
 
-      if (!empresaSlug) {
-        setMsg("Error: empresa no identificada");
-        return;
-      }
+    if (rol === "superadmin") {
+      window.location.href = "/superadmin";
+      return;
+    }
 
-      const redirectMap: Record<string, string> = {
-        cliente: `/${empresaSlug}/cliente`,
-        colaborador: `/${empresaSlug}/colaborador`,
-        admin: `/${empresaSlug}/admin`,
-      };
+    if (!empresaSlug) {
+      setMsg("Error: empresa no identificada");
+      return;
+    }
 
-      window.location.href =
-        redirectMap[rol] || `/${empresaSlug}/login`;
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setMsg("Error: " + err.message);
-      } else {
-        setMsg("Error desconocido");
-      }
+    const redirectMap: Record<string, string> = {
+      cliente: `/${empresaSlug}/cliente`,
+      colaborador: `/${empresaSlug}/colaborador`,
+      admin: `/${empresaSlug}/admin`,
+    };
+
+    window.location.href =
+      redirectMap[rol] || `/${empresaSlug}/login`;
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      setMsg("Error: " + err.message);
+    } else {
+      setMsg("Error desconocido");
     }
   }
+}
+
+
 
   return (
     <main className="p-6 max-w-md mx-auto">
